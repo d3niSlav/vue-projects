@@ -32,7 +32,9 @@ new Vue({
       this.monsterAttack();
     },
     giveUp: function () {
-
+      if (confirm('Do you really want to give up?')) {
+        this.gameIsRunning = false;
+      }
     },
     monsterAttack: function () {
       this.playerHealth -= this.calculateDamage(5, 12);
