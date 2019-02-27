@@ -3,16 +3,24 @@ new Vue({
   data: {
     playerHealth: 100,
     monsterHealth: 100,
-    gameIsRunning: false
+    gameIsRunning: false,
+    gameLog: []
   },
   methods: {
     startGame: function () {
       this.gameIsRunning = true;
       this.playerHealth = 100;
       this.monsterHealth = 100;
+      this.gameLog = [];
     },
     attack: function () {
-      this.monsterHealth -= this.calculateDamage(3, 10);
+      var damage = this.calculateDamage(3, 10);
+      this.monsterHealth -= damage;
+      this.gameLog.unshift({
+        isPlayer: true,
+        message: 'Player attacks Monster for ' + damage + ' damage.'
+      });
+
       if (this.checkWin()) {
         return;
       }
@@ -20,7 +28,13 @@ new Vue({
       this.monsterAttack();
     },
     useSpecialAttack: function () {
-      this.monsterHealth -= this.calculateDamage(10, 20);
+      var damage = this.calculateDamage(10, 20);
+      this.monsterHealth -= damage;
+      this.gameLog.unshift({
+        isPlayer: true,
+        message: 'Player attacks Monster for ' + damage + ' damage.'
+      });
+
       if (this.checkWin()) {
         return;
       }
@@ -29,15 +43,25 @@ new Vue({
     },
     heal: function () {
       this.playerHealth = this.playerHealth <= 90 ? this.playerHealth += 10 : 100;
+      this.gameLog.unshift({
+        isPlayer: true,
+        message: 'Player heals and restores 10 health points.'
+      });
       this.monsterAttack();
     },
     giveUp: function () {
       if (confirm('Do you really want to give up?')) {
         this.gameIsRunning = false;
+        this.gameLog = [];
       }
     },
     monsterAttack: function () {
-      this.playerHealth -= this.calculateDamage(5, 12);
+      var damage = this.calculateDamage(5, 12);
+      this.playerHealth -= damage;
+      this.gameLog.unshift({
+        isPlayer: false,
+        message: 'Monster attacks Player for ' + damage + ' damage.'
+      });
       this.checkWin();
     },
     calculateDamage: function (minimumDamage, maximumDamage) {
@@ -45,9 +69,19 @@ new Vue({
     },
     checkWin: function () {
       if (this.monsterHealth <= 0) {
+        this.monsterHealth = 0;
+        this.gameLog.unshift({
+          isPlayer: true,
+          message: 'Player won!'
+        });
         this.promptMessage('You won!');
         return true;
       } else if (this.playerHealth <= 0) {
+        this.playerHealth = 0;
+        this.gameLog.unshift({
+          isPlayer: false,
+          message: 'Monster won!'
+        });
         this.promptMessage('You lost!');
         return true;
       }
